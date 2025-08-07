@@ -2,7 +2,7 @@ name: explore-with-me
 
 services:
 
-  stat-server:
+  stats-server:
     build:
       context: ./stat/stat-server
     image: explore-with-me-stats
@@ -16,7 +16,7 @@ services:
     depends_on:
       - stat-db
 
-  stat-db:
+  stats-db:
     image: postgres:16.1
     container_name: postgres-stat
     ports:
