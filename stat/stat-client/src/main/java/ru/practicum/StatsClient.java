@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-public class StatsClient extends BaseClient{
+public class StatsClient extends BaseClient {
     String appName;
 
     public StatsClient(@Value("${stat-server.url}") String serverUrl,
