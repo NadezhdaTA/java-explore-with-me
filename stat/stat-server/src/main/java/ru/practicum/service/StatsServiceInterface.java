@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface StatsServiceInterface {
     List<ViewStatsDTO> getStats(StatsRequestDTO statsRequestDTO);
+
     void createHit(EndpointHitDTO hitDTO);
 }
