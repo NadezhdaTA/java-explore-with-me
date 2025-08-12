@@ -1,10 +1,11 @@
-name: explore-with-me
+version: '3.8'
 
 services:
 
   stats-server:
     build:
       context: ./stat/stat-server
+      dockerfile: Dockerfile
     image: explore-with-me-stats
     container_name: explore-with-me-stats
     ports:
@@ -16,23 +17,10 @@ services:
     depends_on:
       - stats-db
 
-  stats-db:
-    image: postgres:16.1
-    container_name: postgres-stat
-    ports:
-      - "6542:5432"
-    environment:
-      - POSTGRES_PASSWORD:12345
-      - POSTGRES_USER:user
-      - POSTGRES_DB:stat-server
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   ewm-service:
-    build: evm-service
+    build:
+      context: ./evm-service
+      dockerfile: Dockerfile
     image: explore-with-me-service
     container_name: explore-with-me-service
     ports:
@@ -48,11 +36,28 @@ services:
     image: postgres:16.1
     container_name: postgres-service
     ports:
-      - "6541:5432"
+      - "6542:5432"
     environment:
       - POSTGRES_PASSWORD=12345
       - POSTGRES_USER=user
       - POSTGRES_DB=ewm-service
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  stats-db:
+    image: postgres:16.1
+    container_name: postgres-stat
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_ROOT_PASSWORD:12345
+      - POSTGRES_PASSWORD:12345
+      - POSTGRES_USER:user
+      - POSTGRES_DB:stat-server
+      - POSTGRES_HOST_AUTH_METHOD=trust
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       interval: 5s

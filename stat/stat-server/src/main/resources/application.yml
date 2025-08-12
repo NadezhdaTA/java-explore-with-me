@@ -19,8 +19,9 @@ spring:
     init:
       mode: always
   datasource:
+    driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/stats-server
     username: user
     password: 12345
-    driverClassName: org.postgresql.Driver
+
 
