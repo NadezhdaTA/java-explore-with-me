@@ -11,11 +11,28 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stat-db:5432/stat-server
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
       - stats-db
+
+  stats-db:
+    image: postgres:16.1
+    container_name: postgres-stat
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_ROOT_PASSWORD:12345
+      - POSTGRES_PASSWORD:12345
+      - POSTGRES_USER:user
+      - POSTGRES_DB:stat-server
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   ewm-service:
     build:
@@ -26,7 +43,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5433/ewm-service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm-service
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
@@ -47,19 +64,3 @@ services:
       timeout: 5s
       retries: 10
 
-  stats-db:
-    image: postgres:16.1
-    container_name: postgres-stat
-    ports:
-      - "6541:5432"
-    environment:
-      - POSTGRES_ROOT_PASSWORD:12345
-      - POSTGRES_PASSWORD:12345
-      - POSTGRES_USER:user
-      - POSTGRES_DB:stat-server
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    healthcheck:
-      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-      interval: 5s
-      timeout: 5s
-      retries: 10
