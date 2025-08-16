@@ -3,19 +3,17 @@ version: '3.8'
 services:
 
   stats-server:
-    build:
-      context: ./stat/stat-server
-      dockerfile: Dockerfile
-    image: explore-with-me-stats
-    container_name: explore-with-me-stats
+    container_name: stats-server
+    image: stats-server
+    build: ./stat/stat-server
     ports:
       - "9090:9090"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat-server
-      - SPRING_DATASOURCE_USERNAME=user
-      - SPRING_DATASOURCE_PASSWORD=12345
     depends_on:
       - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc.postgresql://stats-db:5432/stats-server
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=12345
 
   stats-db:
     image: postgres:16.1
@@ -23,11 +21,9 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_ROOT_PASSWORD:12345
-      - POSTGRES_PASSWORD:12345
-      - POSTGRES_USER:user
-      - POSTGRES_DB:stat-server
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: stats-service
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       interval: 5s
@@ -55,9 +51,9 @@ services:
     ports:
       - "6542:5432"
     environment:
-      - POSTGRES_PASSWORD=12345
-      - POSTGRES_USER=user
-      - POSTGRES_DB=ewm-service
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: ewm-service
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       interval: 5s
