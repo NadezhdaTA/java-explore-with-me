@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.DTO.CategoryDTO.CategoryDTO;
+import ru.practicum.Category.DTO.CategoryDTO;
 import ru.practicum.User.DTO.UserShortDTO;
 import ru.practicum.Model.Location;
 import ru.practicum.Model.State;

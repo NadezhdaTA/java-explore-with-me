@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import ru.practicum.DTO.CategoryDTO.CategoryDTO;
+import ru.practicum.Category.DTO.CategoryDTO;
 import ru.practicum.Model.Location;
 import ru.practicum.Model.State;
 

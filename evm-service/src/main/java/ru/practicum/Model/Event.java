@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.Category.Model.Category;
 import ru.practicum.User.Model.User;
 
 import java.time.LocalDateTime;

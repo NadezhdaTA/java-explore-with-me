@@ -1,4 +1,4 @@
-package ru.practicum.Model;
+package ru.practicum.Category.Model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//@Entity
-//@Table(name = "categories")
+@Entity
+@Table(name = "categories")
 public class Category {
 
     @Id

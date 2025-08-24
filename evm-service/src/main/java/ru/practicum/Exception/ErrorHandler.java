@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 @Slf4j
@@ -21,7 +22,8 @@ public class ErrorHandler {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), stackTrace);
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), stackTrace, timestamp);
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -32,7 +34,8 @@ public class ErrorHandler {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), stackTrace);
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), stackTrace, timestamp);
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -43,7 +46,20 @@ public class ErrorHandler {
         PrintWriter pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         String stackTrace = sw.toString();
-        return new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), stackTrace);
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), stackTrace, timestamp);
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConflictException(final ConflictException e) {
+        log.error("409 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage(), stackTrace, timestamp);
     }
 
 }
