@@ -1,9 +1,9 @@
-package ru.practicum.DTO.EventDTO;
+package ru.practicum.Event.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.Model.State;
+import ru.practicum.Event.Model.State;
 
 import java.util.ArrayList;
 

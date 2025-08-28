@@ -1,4 +1,4 @@
-package ru.practicum.Model;
+package ru.practicum.Event.Model;
 
 
 public enum State {
@@ -9,6 +9,7 @@ public enum State {
     PUBLISH_EVENT,
     REJECT_EVENT,
     CANCEL_REVIEW,
-    SEND_TO_REVIEW
+    SEND_TO_REVIEW,
+    CANCELED
 
 }

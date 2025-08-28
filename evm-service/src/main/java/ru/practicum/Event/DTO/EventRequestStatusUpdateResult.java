@@ -1,9 +1,9 @@
-package ru.practicum.DTO.EventDTO;
+package ru.practicum.Event.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.DTO.ParticipationDTO.ParticipationRequestDto;
+import ru.practicum.Request.RequestDTO.ParticipationRequestDto;
 
 @Data
 @NoArgsConstructor

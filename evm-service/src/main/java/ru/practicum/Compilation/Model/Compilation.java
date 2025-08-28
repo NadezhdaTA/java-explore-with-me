@@ -1,4 +1,4 @@
-package ru.practicum.Model;
+package ru.practicum.Compilation.Model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

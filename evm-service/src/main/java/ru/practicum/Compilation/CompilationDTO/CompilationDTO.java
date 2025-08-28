@@ -1,11 +1,11 @@
-package ru.practicum.DTO.CompilationDTO;
+package ru.practicum.Compilation.CompilationDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.DTO.EventDTO.EventShortDTO;
+import ru.practicum.Event.DTO.EventShortDTO;
 
 import java.util.Set;
 

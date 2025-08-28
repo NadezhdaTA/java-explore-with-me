@@ -1,4 +1,4 @@
-package ru.practicum.Model;
+package ru.practicum.Event.Model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,18 +8,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "locations")
+@Embeddable
 public class Location {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "lat")
     private Float lat;
 
-    @Column(name = "lon")
     private Float lon;
 }
