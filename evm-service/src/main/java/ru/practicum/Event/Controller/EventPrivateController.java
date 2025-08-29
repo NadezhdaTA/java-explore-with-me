@@ -4,10 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.Event.DTO.EventFullDTO;
-import ru.practicum.Event.DTO.NewEventDTO;
-import ru.practicum.Event.DTO.UpdateEventUserRequest;
+import ru.practicum.Event.DTO.*;
 import ru.practicum.Event.Service.Private.EventPrivateServiceImpl;
+import ru.practicum.Request.RequestDTO.ParticipationRequestDto;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users/{userId}/events")
@@ -21,6 +22,13 @@ public class EventPrivateController {
         return eventPrivateService.addEvent(userId, event);
     }
 
+    @GetMapping
+    public List<EventShortDTO> getEvents(@PathVariable Integer userId,
+                                         @RequestParam Integer from,
+                                         @RequestParam Integer size) {
+        return eventPrivateService.getEvents(userId, from, size);
+    }
+
     @GetMapping("/{eventId}")
     public EventFullDTO getEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
         return eventPrivateService.getEvent(userId, eventId);
@@ -28,8 +36,22 @@ public class EventPrivateController {
 
     @PatchMapping("/{eventId}")
     public EventFullDTO updateEvent(@PathVariable Integer userId,
-                                    @PathVariable Integer eventId, @RequestBody @Valid UpdateEventUserRequest event) {
+                                    @PathVariable Integer eventId,
+                                    @RequestBody @Valid UpdateEventUserRequest event) {
         return eventPrivateService.updateEvent(userId, eventId, event);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public List<ParticipationRequestDto> getUserRequests(@PathVariable Integer userId,
+                                                         @PathVariable Integer eventId) {
+        return eventPrivateService.getUserRequests(userId, eventId);
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public EventRequestStatusUpdateResult updateRequests(@RequestBody @Valid EventRequestStatusUpdateRequest request,
+                                                         @PathVariable Integer userId,
+                                                         @PathVariable Integer eventId) {
+        return eventPrivateService.updateRequests(request, userId, eventId);
     }
 
 }

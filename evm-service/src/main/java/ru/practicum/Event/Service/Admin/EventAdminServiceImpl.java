@@ -1,5 +1,6 @@
 package ru.practicum.Event.Service.Admin;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.Category.Repository.CategoryRepository;
@@ -8,9 +9,12 @@ import ru.practicum.Event.DTO.EventsRequestDTO;
 import ru.practicum.Event.DTO.UpdateEventAdminRequest;
 import ru.practicum.Event.Mapper.EventMapper;
 import ru.practicum.Event.Model.Event;
+import ru.practicum.Event.Model.QEvent;
 import ru.practicum.Event.Model.State;
 import ru.practicum.Event.Repository.EventRepository;
 import ru.practicum.Exception.ConflictException;
+import ru.practicum.User.Model.User;
+import ru.practicum.User.Repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,19 +26,22 @@ public class EventAdminServiceImpl implements EventAdminService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<EventFullDTO> getEvents(EventsRequestDTO eventsRequestDTO) {
         List<Event> events = new ArrayList<>();
-        List<Integer> users = eventsRequestDTO.getUsers();
+        List<Integer> users1 = eventsRequestDTO.getUsers();
 
-        for (Integer userId : users) {
+        for (Integer userId : users1) {
             List<Event> eventsForUser = eventRepository.findEventsByInitiatorId(userId);
             events.addAll(eventsForUser);
         }
 
         List<State> states = eventsRequestDTO.getStates();
         List<Integer> categoryIds = eventsRequestDTO.getCategories();
+
+     //   BooleanExpression byPaid = QEvent.event.paid.eq(eventsRequestDTO.)
 
         return events.stream()
                 .filter(event -> states.contains(event.getState()))
