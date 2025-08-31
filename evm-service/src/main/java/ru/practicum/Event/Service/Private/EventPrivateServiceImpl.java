@@ -13,6 +13,7 @@ import ru.practicum.Event.Model.Event;
 import ru.practicum.Event.Repository.EventRepository;
 import ru.practicum.Exception.ConflictException;
 import ru.practicum.Exception.NotFoundException;
+import ru.practicum.Exception.ValidationException;
 import ru.practicum.Request.Mapper.RequestMapper;
 import ru.practicum.Request.Model.Request;
 import ru.practicum.Request.Repository.RequestRepository;
@@ -23,6 +24,7 @@ import ru.practicum.User.Repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.Event.Model.State.*;
 
@@ -52,6 +54,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     @Override
     public EventFullDTO getEvent(Integer userId, Integer eventId) {
         Event event = checkEvent(eventId);
+        int confirmedRequests = requestRepository.findRequestsByEvent_IdAndStatus(eventId, CONFIRMED).size();
         return eventMapper.toEventFullDTO(event);
     }
 
@@ -62,6 +65,13 @@ public class EventPrivateServiceImpl implements EventPrivateService {
 
         if (eventFound.getState().equals(PUBLISHED)) {
             throw new ConflictException("Event with id " + eventId + " could not be changed");
+        }
+
+        if (event.getStateAction() != null) {
+            switch (event.getStateAction()) {
+                case CANCEL_REVIEW -> eventFound.setState(CANCELED);
+                case SEND_TO_REVIEW -> eventFound.setState(PENDING);
+            }
         }
 
         if (!userId.equals(eventFound.getInitiator().getId())) {
@@ -77,8 +87,6 @@ public class EventPrivateServiceImpl implements EventPrivateService {
             checkDates(eventFound.getCreatedOn(), event.getEventDate());
             eventFound.setEventDate(event.getEventDate());
         }
-
-        eventFound.setState(CANCELED);
 
         return eventMapper.toEventFullDTO(eventRepository.save(eventFound));
     }
@@ -96,36 +104,42 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     @Override
     public EventRequestStatusUpdateResult updateRequests(EventRequestStatusUpdateRequest request,
                                                          Integer userId, Integer eventId) {
-        Event event = checkEvent(eventId);
         checkUser(userId);
+        Event event = checkEvent(eventId);
         List<Request> requests = requestRepository.findAllById(request.getRequestIds());
-        List<Request> allRequests = requestRepository.findRequestsByEvent_Id(eventId);
+
+        if (Objects.equals(event.getParticipantLimit(), event.getConfirmedRequests())) {
+            throw new ConflictException("ConfirmedRequests limit exceeded");
+        }
 
         List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
         List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
 
         for (Request request1 : requests) {
-            if (event.getState().equals(PUBLISHED)) {
-                if (event.getParticipantLimit() != null) {
+            if (!request1.getStatus().equals(PENDING)) {
+                throw new ConflictException("States should be PENDING");
+            }
 
-                    if (allRequests.size() < event.getParticipantLimit()) {
-                        request1.setStatus(CONFIRMED);
-                        requestRepository.save(request1);
-                        confirmedRequests.add(requestMapper.toParticipationRequestDto(request1));
-                    } else {
-                        request1.setStatus(REJECTED);
-                        requestRepository.save(request1);
-                        confirmedRequests.add(requestMapper.toParticipationRequestDto(request1));
-                        throw new ConflictException("Participation limit exceeded");
-                    }
+            if (request.getStatus().equals(CONFIRMED)) {
+                if (event.getParticipantLimit() > event.getConfirmedRequests()) {
+                    request1.setStatus(CONFIRMED);
+                    requestRepository.save(request1);
+                    confirmedRequests.add(requestMapper.toParticipationRequestDto(request1));
+                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                    eventRepository.save(event);
+                } else {
+                    request1.setStatus(REJECTED);
+                    requestRepository.save(request1);
+                    rejectedRequests.add(requestMapper.toParticipationRequestDto(request1));
                 }
             } else {
-                throw new ConflictException("Event Status should be PUBLISHED");
+                request1.setStatus(REJECTED);
+                requestRepository.save(request1);
+                rejectedRequests.add(requestMapper.toParticipationRequestDto(request1));
             }
         }
 
         return new EventRequestStatusUpdateResult(confirmedRequests, rejectedRequests);
-
     }
 
     @Override
@@ -141,7 +155,7 @@ public class EventPrivateServiceImpl implements EventPrivateService {
     private void checkDates(LocalDateTime createdOn, LocalDateTime eventDate) {
         if (eventDate.isBefore(createdOn) ||
         eventDate.minusHours(2L).isBefore(createdOn)) {
-            throw new ConflictException("Event date should be 2 horse after creation  date");
+            throw new ValidationException("Event date should be 2 horse after creation  date");
         }
     }
 

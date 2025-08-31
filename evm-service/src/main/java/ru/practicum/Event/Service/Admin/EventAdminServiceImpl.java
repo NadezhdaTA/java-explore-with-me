@@ -1,24 +1,25 @@
 package ru.practicum.Event.Service.Admin;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.Category.Repository.CategoryRepository;
 import ru.practicum.Event.DTO.EventFullDTO;
-import ru.practicum.Event.DTO.EventsRequestDTO;
+import ru.practicum.Event.DTO.SearchEventsDTO;
 import ru.practicum.Event.DTO.UpdateEventAdminRequest;
 import ru.practicum.Event.Mapper.EventMapper;
 import ru.practicum.Event.Model.Event;
-import ru.practicum.Event.Model.QEvent;
 import ru.practicum.Event.Model.State;
 import ru.practicum.Event.Repository.EventRepository;
 import ru.practicum.Exception.ConflictException;
-import ru.practicum.User.Model.User;
+import ru.practicum.Exception.ValidationException;
 import ru.practicum.User.Repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -29,28 +30,21 @@ public class EventAdminServiceImpl implements EventAdminService {
     private final UserRepository userRepository;
 
     @Override
-    public List<EventFullDTO> getEvents(EventsRequestDTO eventsRequestDTO) {
-        List<Event> events = new ArrayList<>();
-        List<Integer> users1 = eventsRequestDTO.getUsers();
-
-        for (Integer userId : users1) {
-            List<Event> eventsForUser = eventRepository.findEventsByInitiatorId(userId);
-            events.addAll(eventsForUser);
+    public List<EventFullDTO> getEvents(SearchEventsDTO dto) {
+        if (dto.getRangeStart() != null || dto.getRangeEnd() != null) {
+            if (dto.getRangeStart().isAfter(dto.getRangeEnd())) {
+                throw new ValidationException("Range start is after range end");
+            }
         }
 
-        List<State> states = eventsRequestDTO.getStates();
-        List<Integer> categoryIds = eventsRequestDTO.getCategories();
+        Specification<Event> spec = getEventSpecification(dto);
+        Pageable pageable = PageRequest.of(dto.getFrom(), dto.getSize());
 
-     //   BooleanExpression byPaid = QEvent.event.paid.eq(eventsRequestDTO.)
+        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
 
         return events.stream()
-                .filter(event -> states.contains(event.getState()))
-                .filter(event -> categoryIds.contains(event.getCategory().getId()))
-                .filter(event -> event.getEventDate().isAfter(eventsRequestDTO.getRangeStart()))
-                .filter(event -> event.getEventDate().isBefore(eventsRequestDTO.getRangeEnd()))
                 .map(eventMapper::toEventFullDTO)
                 .toList();
-
     }
 
     @Override
@@ -90,5 +84,40 @@ public class EventAdminServiceImpl implements EventAdminService {
         Event updatedEvent = eventMapper.toEvent(request, event);
 
         return eventMapper.toEventFullDTO(eventRepository.save(updatedEvent));
+    }
+
+    private Specification<Event> getEventSpecification(SearchEventsDTO event) {
+        Specification<Event> spec = Specification.where(null);
+
+        if (Objects.nonNull(event.getUsers()) && !event.getUsers().isEmpty()) {
+            spec = spec.and((root, query, cb) -> root.get("initiator").get("id").in(
+                    event.getUsers().stream().filter(Objects::nonNull).toList()));
+        }
+
+        if (Objects.nonNull(event.getCategories() ) && !event.getCategories().isEmpty()) {
+            spec = spec.and((root, query, builder) ->
+                    root.get("category").get("id").in(event.getCategories().stream()
+                            .filter(Objects::nonNull)
+                            .toList()));
+        }
+
+        if (Objects.nonNull(event.getStates() ) && !event.getStates().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("state").in(event.getStates().stream()
+                    .filter(Objects::nonNull)
+                    .toList()));
+        }
+
+        if (Objects.nonNull(event.getRangeStart())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("eventDate"), event.getRangeStart()));
+        }
+
+        if (Objects.nonNull(event.getRangeEnd())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("eventDate"), event.getRangeEnd()));
+        }
+
+        return spec;
     }
 }

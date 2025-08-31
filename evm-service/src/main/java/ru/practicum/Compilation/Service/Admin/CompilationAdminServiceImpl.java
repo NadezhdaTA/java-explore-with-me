@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.Compilation.CompilationDTO.CompilationDTO;
 import ru.practicum.Compilation.CompilationDTO.NewCompilationDTO;
+import ru.practicum.Compilation.CompilationDTO.UpdateCompilationRequest;
 import ru.practicum.Compilation.Mapper.CompilationMapper;
 import ru.practicum.Compilation.Model.Compilation;
 import ru.practicum.Compilation.Repository.CompilationRepository;
@@ -43,7 +44,7 @@ public class CompilationAdminServiceImpl implements CompilationAdminService {
     }
 
     @Override
-    public CompilationDTO updateCompilation(Integer compId, NewCompilationDTO compilationDTO) {
+    public CompilationDTO updateCompilation(Integer compId, UpdateCompilationRequest compilationDTO) {
         Compilation compilation = checkCompilation(compId);
 
         if (compilationDTO.getEvents() != null) {

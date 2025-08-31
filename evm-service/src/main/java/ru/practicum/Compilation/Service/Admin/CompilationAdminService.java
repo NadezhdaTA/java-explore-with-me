@@ -2,6 +2,7 @@ package ru.practicum.Compilation.Service.Admin;
 
 import ru.practicum.Compilation.CompilationDTO.CompilationDTO;
 import ru.practicum.Compilation.CompilationDTO.NewCompilationDTO;
+import ru.practicum.Compilation.CompilationDTO.UpdateCompilationRequest;
 
 
 public interface CompilationAdminService {
@@ -9,5 +10,5 @@ public interface CompilationAdminService {
 
     void deleteCompilation(Integer compId);
 
-    CompilationDTO updateCompilation(Integer compId, NewCompilationDTO compilationDTO);
+    CompilationDTO updateCompilation(Integer compId, UpdateCompilationRequest compilationDTO);
 }

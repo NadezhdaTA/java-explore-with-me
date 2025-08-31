@@ -30,6 +30,9 @@ public class Event {
     @ManyToOne(fetch = FetchType.EAGER)
     private Category category;
 
+    @Column(name = "confirmed_requests")
+    private Integer confirmedRequests = 0;
+
     @Column(name = "created_on")
     private LocalDateTime createdOn = LocalDateTime.now();
 
@@ -63,5 +66,5 @@ public class Event {
     private State state;
 
     @Column(name = "views")
-    private Integer views;
+    private Integer views = 0;
 }

@@ -1,5 +1,7 @@
 package ru.practicum.Event.Controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.Event.DTO.EventFullDTO;
@@ -17,12 +19,13 @@ public class EventPublicController {
     private final EventPublicServiceImpl eventPublicService;
 
     @GetMapping("/{id}")
-    public EventFullDTO findEventById(@PathVariable Integer id) {
-        return eventPublicService.findEventById(id);
+    public EventFullDTO findEventById(@PathVariable Integer id, HttpServletRequest request) {
+        return eventPublicService.findEventById(id, request);
     }
 
     @GetMapping
-    public List<EventShortDTO> findAllEvents(@ModelAttribute EventPublicParams params) {
-        return eventPublicService.findAllEvents(params);
+    public List<EventShortDTO> findAllEvents(@ModelAttribute @Valid EventPublicParams params,
+                                             HttpServletRequest request) {
+        return eventPublicService.findAllEvents(params, request);
     }
 }

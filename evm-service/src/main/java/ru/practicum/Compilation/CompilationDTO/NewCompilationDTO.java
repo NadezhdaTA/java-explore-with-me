@@ -13,7 +13,7 @@ import java.util.ArrayList;
 @AllArgsConstructor
 public class NewCompilationDTO {
     private ArrayList<Integer> events;
-    private Boolean pinned;
+    private Boolean pinned = false;
 
     @NotBlank
     @Length(min = 1, max = 50)

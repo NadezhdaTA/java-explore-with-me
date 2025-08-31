@@ -17,6 +17,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/ewm-service
     username: user
     password: 12345
+  application:
+    name: evm-service
+
 logging:
   level:
     org:

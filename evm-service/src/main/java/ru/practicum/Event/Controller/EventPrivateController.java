@@ -1,6 +1,8 @@
 package ru.practicum.Event.Controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,8 @@ public class EventPrivateController {
 
     @GetMapping
     public List<EventShortDTO> getEvents(@PathVariable Integer userId,
-                                         @RequestParam Integer from,
-                                         @RequestParam Integer size) {
+                                         @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                         @RequestParam(defaultValue = "10") @Positive Integer size) {
         return eventPrivateService.getEvents(userId, from, size);
     }
 

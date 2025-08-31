@@ -1,7 +1,9 @@
 package ru.practicum.Exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,7 +18,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException(final Exception e) {
+    public ErrorResponse handleException(final RuntimeException e) {
         log.error("500 {}", e.getMessage(), e);
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -62,4 +64,27 @@ public class ErrorHandler {
         return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage(), stackTrace, timestamp);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingPathVariableException(final MissingServletRequestParameterException e) {
+        log.error("400 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), stackTrace, timestamp);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handSQLException(final DataIntegrityViolationException e) {
+        log.error("409 {}", e.getMessage(), e);
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String stackTrace = sw.toString();
+        LocalDateTime timestamp = LocalDateTime.now();
+        return new ErrorResponse(HttpStatus.CONFLICT, e.getMessage(), stackTrace, timestamp);
+    }
 }

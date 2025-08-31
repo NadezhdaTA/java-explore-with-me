@@ -1,17 +1,20 @@
 package ru.practicum;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+@Component
 public class StatsClient extends BaseClient {
-    String appName;
 
-    public StatsClient(@Value("${stat-server.url}") String serverUrl,
-                       @Value("${appName}") String appName) {
+
+    @Autowired
+    public StatsClient(@Value("${stat-server.url}") String serverUrl) {
         super(RestClient.create(serverUrl));
-        this.appName = appName;
+
     }
 
     private static RestClient createRestClient(String serverUrl) {

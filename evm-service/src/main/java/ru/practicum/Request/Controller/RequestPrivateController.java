@@ -1,7 +1,6 @@
 package ru.practicum.Request.Controller;
 
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,7 @@ public class RequestPrivateController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable @Positive Integer userId,
-                                              @RequestParam @PositiveOrZero Integer eventId) {
+                                              @RequestParam @Positive Integer eventId) {
         return requestService.addRequest(userId, eventId);
     }
 

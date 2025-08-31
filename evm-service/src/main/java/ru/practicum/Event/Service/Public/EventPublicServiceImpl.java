@@ -1,22 +1,32 @@
 package ru.practicum.Event.Service.Public;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.practicum.Category.Model.Category;
 import ru.practicum.Category.Repository.CategoryRepository;
 import ru.practicum.Event.DTO.EventFullDTO;
 import ru.practicum.Event.DTO.EventPublicParams;
 import ru.practicum.Event.DTO.EventShortDTO;
 import ru.practicum.Event.Mapper.EventMapper;
 import ru.practicum.Event.Model.Event;
-import ru.practicum.Event.Model.QEvent;
+import ru.practicum.Event.Model.State;
 import ru.practicum.Event.Repository.EventRepository;
 import ru.practicum.Exception.NotFoundException;
-import ru.practicum.Request.Model.QRequest;
+import ru.practicum.Exception.ValidationException;
+import ru.practicum.Request.Model.Request;
 import ru.practicum.Request.Repository.RequestRepository;
+import ru.practicum.StatsClient;
 
 import java.util.List;
+import java.util.Objects;
+
 
 @Service
 @RequiredArgsConstructor
@@ -25,29 +35,77 @@ public class EventPublicServiceImpl implements EventPublicService {
     private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
     private final RequestRepository requestRepository;
+    private final StatsClient statsClient;
 
     @Override
-    public EventFullDTO findEventById(Integer id) {
-        Event event = eventRepository.findById(id)
+    public EventFullDTO findEventById(Integer id, HttpServletRequest request) {
+        Event event = eventRepository.findEventsByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Event with id " + id + " not found"));
+
+        event.setViews(event.getViews() + 1);
+        eventRepository.save(event);
+
         return eventMapper.toEventFullDTO(event);
     }
 
     @Override
-    public List<EventShortDTO> findAllEvents(EventPublicParams params) {
-        List<Category> categories = categoryRepository.findAllById(params.getCategories());
+    public List<EventShortDTO> findAllEvents(EventPublicParams params, HttpServletRequest request) {
+        if (params.getRangeStart() != null || params.getRangeEnd() != null) {
+            if (params.getRangeStart().isAfter(params.getRangeEnd())) {
+                throw new ValidationException("Range start is after range end");
+            }
+        }
+        Specification<Event> spec = eventSpecification(params);
+        Sort sort = null;
+        
+        switch (params.getSort()) {
+            case "EVENT_DATE" -> sort = Sort.by(Sort.Direction.DESC, "eventDate");
+            case "VIEWS" -> sort = Sort.by(Sort.Direction.ASC, "views");
+        }
+        
+        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize(), sort);
 
+        Page<Event> events = eventRepository.findAll(spec, pageable);
 
-        BooleanExpression byPaid = QEvent.event.paid.eq(params.getPaid());
+        return events.getContent().stream()
+                .map(eventMapper::toEventShortDTO)
+                .toList();
+    }
 
-      /* List<Event> events = eventRepository.findAll(byPaid
-                .and(QEvent.event.description.contains(params.getText()))
-                .and(QEvent.event.eventDate.between(params.getRangeStart(), params.getRangeEnd()))
-                .and(QEvent.event.category.in(categories))
-                .and(QEvent.event.participantLimit)
-                .orderedBy(params.getSort())
-                .pageble(params.getFrom(), params.getSize())
-                );*/
-        return List.of();
+    private Specification<Event> eventSpecification(EventPublicParams params) {
+        Specification<Event> spec = Specification.where(null);
+
+        if (Objects.nonNull(params.getText()) && !params.getText().isBlank()) {
+            String search = "%" + params.getText().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("annotation")), search),
+                            cb.like(cb.lower(root.get("description")), search)
+                    ));
+        }
+
+        if (Objects.nonNull(params.getCategories() ) && !params.getCategories().isEmpty()) {
+            spec = spec.and((root, query, builder) ->
+                    root.get("category").get("id").in(params.getCategories().stream().filter(Objects::nonNull).toList()));
+        }
+
+        if (Objects.nonNull(params.getPaid())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("paid"), params.getPaid()));
+        }
+
+        if (Objects.nonNull(params.getOnlyAvailable())) {
+            spec = spec.and((root, query, cb) -> {
+                        assert query != null;
+                        Subquery<Long> subquery = query.subquery(Long.class);
+                        Root<Request> requestRoot = subquery.from(Request.class);
+                        subquery.select(cb.count(requestRoot.get("id")))
+                                .where(cb.equal(requestRoot.get("event"), root));
+
+                        return cb.greaterThan(root.get("participantLimit"), subquery);
+                    });
+        }
+
+        return spec;
     }
 }
