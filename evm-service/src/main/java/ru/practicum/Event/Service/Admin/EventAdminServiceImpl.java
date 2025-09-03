@@ -94,14 +94,14 @@ public class EventAdminServiceImpl implements EventAdminService {
                     event.getUsers().stream().filter(Objects::nonNull).toList()));
         }
 
-        if (Objects.nonNull(event.getCategories() ) && !event.getCategories().isEmpty()) {
+        if (Objects.nonNull(event.getCategories()) && !event.getCategories().isEmpty()) {
             spec = spec.and((root, query, builder) ->
                     root.get("category").get("id").in(event.getCategories().stream()
                             .filter(Objects::nonNull)
                             .toList()));
         }
 
-        if (Objects.nonNull(event.getStates() ) && !event.getStates().isEmpty()) {
+        if (Objects.nonNull(event.getStates()) && !event.getStates().isEmpty()) {
             spec = spec.and((root, query, cb) ->
                     root.get("state").in(event.getStates().stream()
                     .filter(Objects::nonNull)

@@ -1,7 +1,9 @@
 package ru.practicum;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,16 +14,19 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class StatsRequestDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "Start date is required")
-    LocalDateTime start;
+    @JsonProperty(value = "start")
+    private LocalDateTime start;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull(message = "End date is required")
-    LocalDateTime end;
+    @JsonProperty(value = "end")
+    private LocalDateTime end;
 
-    List<String> uris;
-    Boolean unique;
+    private List<String> uris;
+    private Boolean unique;
 
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDTO;
 import ru.practicum.StatsRequestDTO;
 import ru.practicum.ViewStatsDTO;
+import ru.practicum.exceptions.ValidationException;
 import ru.practicum.mapper.HitsMapper;
 import ru.practicum.mapper.ViewStatsMapper;
 import ru.practicum.model.EndpointHit;
@@ -22,6 +23,11 @@ public class StatsServiceImpl implements StatsServiceInterface {
 
     @Override
     public List<ViewStatsDTO> getStats(StatsRequestDTO statsRequestDTO) {
+        if (statsRequestDTO.getStart().isAfter(statsRequestDTO.getEnd())) {
+            throw new ValidationException("Start date cannot be after end date");
+        } else if (statsRequestDTO.getStart() == null || statsRequestDTO.getEnd() == null) {
+            throw new ValidationException("Start date cannot be after end date");
+        }
 
         List<ViewStats> stats;
         if (statsRequestDTO.getUnique() == null) {
@@ -34,9 +40,11 @@ public class StatsServiceImpl implements StatsServiceInterface {
         } else {
             stats = statsService.getStats(statsRequestDTO.getStart(), statsRequestDTO.getEnd());
         }
-        return stats.stream()
+        List<ViewStatsDTO> views =  stats.stream()
                 .map(viewStatsMapper::mapViewStats)
                 .toList();
+
+        return views;
     }
 
     @Override

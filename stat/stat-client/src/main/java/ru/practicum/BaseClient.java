@@ -2,23 +2,19 @@ package ru.practicum;
 
 import io.micrometer.common.lang.Nullable;
 import org.springframework.http.*;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
 
 public class BaseClient {
-    protected final RestClient restClient;
+    protected final RestTemplate restTemplate;
 
-    public BaseClient(RestClient restClient) {
-        this.restClient = restClient;
+    public BaseClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    protected ResponseEntity<Object> get(String path, Object object) {
-        return makeAndSendRequest(HttpMethod.GET, path, null, object);
-    }
+
 
     protected  ResponseEntity<Object> post(String path, Object body) {
         return makeAndSendRequest(HttpMethod.POST, path, null, body);
@@ -27,31 +23,15 @@ public class BaseClient {
     private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
                                                           @Nullable Map<String, Object> parameters,
                                                           @Nullable T body) {
-        try {
-            RestClient.RequestBodySpec requestSpec = restClient.method(method)
-                    .uri(uriBuilder -> {
-                        UriComponentsBuilder builder = UriComponentsBuilder.fromPath(path);
-                        if (parameters != null) {
-                            parameters.forEach(builder::queryParam);
-                        }
-                        return builder.build().toUri();
-                    })
-                    .headers(headers -> {
-                        headers.setAll(defaultHeaders().toSingleValueMap());
-                    });
-
-            if (body != null) {
-                requestSpec.body(body);
-            }
-
-            ResponseEntity<Object> responseEntity = requestSpec.retrieve()
-                    .toEntity(Object.class);
-
-            return prepareResponse(responseEntity);
-        } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(e.getResponseBodyAsByteArray());
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
+        ResponseEntity<Object> statsServiceResponse;
+        if (parameters != null) {
+            statsServiceResponse = restTemplate.exchange(path, method, requestEntity, Object.class, parameters);
+        } else {
+            statsServiceResponse = restTemplate.exchange(path, method, requestEntity, Object.class);
         }
+
+        return prepareResponse(statsServiceResponse);
     }
 
     private HttpHeaders defaultHeaders() {

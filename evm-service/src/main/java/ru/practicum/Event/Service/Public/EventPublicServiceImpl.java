@@ -4,7 +4,6 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +22,15 @@ import ru.practicum.Exception.ValidationException;
 import ru.practicum.Request.Model.Request;
 import ru.practicum.Request.Repository.RequestRepository;
 import ru.practicum.StatsClient;
+import ru.practicum.ViewStatsDTO;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import static java.lang.Integer.parseInt;
 
 
 @Service
@@ -42,6 +47,7 @@ public class EventPublicServiceImpl implements EventPublicService {
         Event event = eventRepository.findEventsByIdAndState(id, State.PUBLISHED)
                 .orElseThrow(() -> new NotFoundException("Event with id " + id + " not found"));
 
+        statsClient.createHit(request, "ewm-main-service");
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
 
@@ -50,6 +56,8 @@ public class EventPublicServiceImpl implements EventPublicService {
 
     @Override
     public List<EventShortDTO> findAllEvents(EventPublicParams params, HttpServletRequest request) {
+        statsClient.createHit(request, "ewm-main-service");
+
         if (params.getRangeStart() != null || params.getRangeEnd() != null) {
             if (params.getRangeStart().isAfter(params.getRangeEnd())) {
                 throw new ValidationException("Range start is after range end");
@@ -57,19 +65,43 @@ public class EventPublicServiceImpl implements EventPublicService {
         }
         Specification<Event> spec = eventSpecification(params);
         Sort sort = null;
-        
         switch (params.getSort()) {
             case "EVENT_DATE" -> sort = Sort.by(Sort.Direction.DESC, "eventDate");
             case "VIEWS" -> sort = Sort.by(Sort.Direction.ASC, "views");
         }
-        
         Pageable pageable = PageRequest.of(params.getFrom(), params.getSize(), sort);
 
-        Page<Event> events = eventRepository.findAll(spec, pageable);
+        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
 
-        return events.getContent().stream()
+        Map<Integer, Integer> views = getStats(events, request);
+        return events.stream()
+                .peek(event -> {
+                    if (views.containsKey(event.getId())) {
+                        event.setViews(views.get(event.getId()));
+                    }
+                })
                 .map(eventMapper::toEventShortDTO)
                 .toList();
+    }
+
+    private Map<Integer, Integer> getStats(List<Event> events, HttpServletRequest request) {
+        List<String> uris = events.stream()
+                .map(event -> {
+                    return request.getRequestURI() + "/" + event.getId();
+                })
+                .toList();
+        LocalDateTime start = LocalDateTime.now().minusMonths(6);
+        LocalDateTime end = LocalDateTime.now().plusMinutes(1);
+        List<ViewStatsDTO> viewStatsDTOS = statsClient.viewStats(start, end, uris, true);
+
+        Map<Integer, Integer> eventViews = new HashMap<>();
+        if (!viewStatsDTOS.isEmpty()) {
+            for (ViewStatsDTO viewStatsDTO : viewStatsDTOS) {
+                int eventId = parseInt(viewStatsDTO.getUri().substring("/events/".length()));
+                eventViews.put(eventId, viewStatsDTO.getHits());
+            }
+        }
+        return eventViews;
     }
 
     private Specification<Event> eventSpecification(EventPublicParams params) {
@@ -84,9 +116,11 @@ public class EventPublicServiceImpl implements EventPublicService {
                     ));
         }
 
-        if (Objects.nonNull(params.getCategories() ) && !params.getCategories().isEmpty()) {
+        if (Objects.nonNull(params.getCategories()) && !params.getCategories().isEmpty()) {
             spec = spec.and((root, query, builder) ->
-                    root.get("category").get("id").in(params.getCategories().stream().filter(Objects::nonNull).toList()));
+                    root.get("category").get("id").in(params.getCategories().stream()
+                            .filter(Objects::nonNull)
+                            .toList()));
         }
 
         if (Objects.nonNull(params.getPaid())) {

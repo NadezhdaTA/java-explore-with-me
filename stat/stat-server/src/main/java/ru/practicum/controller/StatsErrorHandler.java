@@ -13,11 +13,11 @@ import java.io.StringWriter;
 
 @RestControllerAdvice
 @Slf4j
-public class ErrorHandler {
+public class StatsErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleException(final Exception e) {
+    public ErrorResponse handleException(final RuntimeException e) {
         log.error("500 {}", e.getMessage(), e);
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
