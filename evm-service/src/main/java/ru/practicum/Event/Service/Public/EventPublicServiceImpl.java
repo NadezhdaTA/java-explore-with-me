@@ -48,8 +48,10 @@ public class EventPublicServiceImpl implements EventPublicService {
                 .orElseThrow(() -> new NotFoundException("Event with id " + id + " not found"));
 
         statsClient.createHit(request, "ewm-main-service");
-        event.setViews(event.getViews() + 1);
-        eventRepository.save(event);
+
+        List<String> uris = List.of(request.getRequestURI());
+        Map<Integer, Integer> views = getStats(uris, request);
+        event.setViews(views.get(event.getId()));
 
         return eventMapper.toEventFullDTO(event);
     }
@@ -72,8 +74,13 @@ public class EventPublicServiceImpl implements EventPublicService {
         Pageable pageable = PageRequest.of(params.getFrom(), params.getSize(), sort);
 
         List<Event> events = eventRepository.findAll(spec, pageable).getContent();
+        List<String> uris = events.stream()
+                .map(event -> {
+                    return request.getRequestURI() + "/" + event.getId();
+                })
+                .toList();
 
-        Map<Integer, Integer> views = getStats(events, request);
+        Map<Integer, Integer> views = getStats(uris, request);
         return events.stream()
                 .peek(event -> {
                     if (views.containsKey(event.getId())) {
@@ -84,12 +91,8 @@ public class EventPublicServiceImpl implements EventPublicService {
                 .toList();
     }
 
-    private Map<Integer, Integer> getStats(List<Event> events, HttpServletRequest request) {
-        List<String> uris = events.stream()
-                .map(event -> {
-                    return request.getRequestURI() + "/" + event.getId();
-                })
-                .toList();
+    private Map<Integer, Integer> getStats(List<String> uris, HttpServletRequest request) {
+
         LocalDateTime start = LocalDateTime.now().minusMonths(6);
         LocalDateTime end = LocalDateTime.now().plusMinutes(1);
         List<ViewStatsDTO> viewStatsDTOS = statsClient.viewStats(start, end, uris, true);
@@ -97,8 +100,9 @@ public class EventPublicServiceImpl implements EventPublicService {
         Map<Integer, Integer> eventViews = new HashMap<>();
         if (!viewStatsDTOS.isEmpty()) {
             for (ViewStatsDTO viewStatsDTO : viewStatsDTOS) {
-                int eventId = parseInt(viewStatsDTO.getUri().substring("/events/".length()));
-                eventViews.put(eventId, viewStatsDTO.getHits());
+                int index = viewStatsDTO.getUri().lastIndexOf('/') + 1;
+                int id = parseInt(viewStatsDTO.getUri().substring(index));
+                eventViews.put(id, viewStatsDTO.getHits());
             }
         }
         return eventViews;

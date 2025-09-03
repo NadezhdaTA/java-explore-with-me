@@ -45,7 +45,8 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public List<UserDTO> getUsers(UsersListRequest request) {
-        Pageable pageable = PageRequest.of(request.getFrom(), request.getSize(), Sort.by("id").ascending());
+        int pageNumber = (int) Math.floor((double) request.getFrom() / request.getSize());
+        Pageable pageable = PageRequest.of(pageNumber, request.getSize(), Sort.Direction.ASC, "id");
         Page<User> users = request.getIds() == null
                 ? userRepository.findAll(pageable)
                 : userRepository.findAllByIdIn(request.getIds(), pageable);

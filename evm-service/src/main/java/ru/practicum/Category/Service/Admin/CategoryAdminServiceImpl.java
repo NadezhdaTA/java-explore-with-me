@@ -43,11 +43,17 @@ public class CategoryAdminServiceImpl implements CategoryAdminService {
     }
 
     @Override
-    public CategoryDTO updateCategory(int id, CategoryDTO categoryDTO) {
+    public CategoryDTO updateCategory(int id, CategoryDTO newCategory) {
         Category category = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with id " + id + " not found"));
 
-        return categoryMapper.toCategoryDTO(repository.save(categoryMapper.toCategory(categoryDTO)));
+        if (category.getName().equals(newCategory.getName())) {
+            return categoryMapper.toCategoryDTO(category);
+        } else {
+            return categoryMapper.toCategoryDTO(repository.save(categoryMapper.toCategory(newCategory)));
+        }
+
+
     }
 
 

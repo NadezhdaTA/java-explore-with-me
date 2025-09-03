@@ -29,7 +29,6 @@ public class StatsClient extends BaseClient {
         this.serverUrl = serverUrl;
     }
 
-
     public ResponseEntity<Object> createHit(HttpServletRequest request, String appName) {
         String uri = request.getRequestURI();
         EndpointHitDTO dto = getEndpointHitDTO(request, appName);

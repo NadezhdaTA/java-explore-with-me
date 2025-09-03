@@ -31,7 +31,7 @@ public class EventAdminServiceImpl implements EventAdminService {
 
     @Override
     public List<EventFullDTO> getEvents(SearchEventsDTO dto) {
-        if (dto.getRangeStart() != null || dto.getRangeEnd() != null) {
+        if (dto.getRangeStart() != null && dto.getRangeEnd() != null) {
             if (dto.getRangeStart().isAfter(dto.getRangeEnd())) {
                 throw new ValidationException("Range start is after range end");
             }
