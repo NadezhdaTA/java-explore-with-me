@@ -40,7 +40,7 @@ public class EventFullDTO {
     private Integer participantLimit;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime publishedOn;
+    private LocalDateTime publishedOn = LocalDateTime.now();
 
     private Boolean requestModeration;
 

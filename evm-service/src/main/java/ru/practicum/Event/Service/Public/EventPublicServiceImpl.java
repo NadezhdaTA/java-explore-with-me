@@ -1,7 +1,5 @@
 package ru.practicum.Event.Service.Public;
 
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +17,6 @@ import ru.practicum.Event.Model.State;
 import ru.practicum.Event.Repository.EventRepository;
 import ru.practicum.Exception.NotFoundException;
 import ru.practicum.Exception.ValidationException;
-import ru.practicum.Request.Model.Request;
 import ru.practicum.Request.Repository.RequestRepository;
 import ru.practicum.StatsClient;
 import ru.practicum.ViewStatsDTO;
@@ -121,10 +118,9 @@ public class EventPublicServiceImpl implements EventPublicService {
         }
 
         if (Objects.nonNull(params.getCategories()) && !params.getCategories().isEmpty()) {
-            spec = spec.and((root, query, builder) ->
-                    root.get("category").get("id").in(params.getCategories().stream()
-                            .filter(Objects::nonNull)
-                            .toList()));
+            spec = spec.and((root, query, cb) ->
+                    root.get("category").get("id").in(
+                    params.getCategories()));
         }
 
         if (Objects.nonNull(params.getPaid())) {
@@ -133,15 +129,24 @@ public class EventPublicServiceImpl implements EventPublicService {
         }
 
         if (Objects.nonNull(params.getOnlyAvailable())) {
-            spec = spec.and((root, query, cb) -> {
-                        assert query != null;
-                        Subquery<Long> subquery = query.subquery(Long.class);
-                        Root<Request> requestRoot = subquery.from(Request.class);
-                        subquery.select(cb.count(requestRoot.get("id")))
-                                .where(cb.equal(requestRoot.get("event"), root));
+            spec = spec.and((root, query, cb) ->
+                cb.or(
+                        cb.equal(root.get("participantLimit"), 0),
+                        cb.lessThan(
+                                root.get("confirmedRequests"),
+                                root.get("participantLimit")
+                        )
+                ));
+        }
 
-                        return cb.greaterThan(root.get("participantLimit"), subquery);
-                    });
+        if (Objects.nonNull(params.getRangeStart())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("eventDate"), params.getRangeStart()));
+        }
+
+        if (Objects.nonNull(params.getRangeEnd())) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("eventDate"), params.getRangeEnd()));
         }
 
         return spec;
