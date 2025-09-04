@@ -1,10 +1,6 @@
 package ru.practicum.User.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.Exception.NotFoundException;
 import ru.practicum.User.DTO.NewUserRequest;
@@ -46,13 +42,11 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public List<UserDTO> getUsers(UsersListRequest request) {
-        Pageable pageable = PageRequest.of(request.getFrom() / request.getSize(), request.getSize(), Sort.by("id").ascending());
+        List<User> users = request.getIds() == null
+                ? userRepository.findAll()
+                : userRepository.findUsersByIdIn(request.getIds());
 
-        Page<User> users = request.getIds() == null
-                ? userRepository.findAll(pageable)
-                : userRepository.findByIdIn(request.getIds(), pageable);
-
-        return users.getContent().stream()
+        return users.stream()
                 .map(userMapper::toUserDTO)
                 .toList();
     }
