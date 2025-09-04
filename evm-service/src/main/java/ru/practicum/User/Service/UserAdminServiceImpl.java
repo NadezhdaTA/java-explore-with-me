@@ -16,6 +16,7 @@ import ru.practicum.User.Repository.UserRepository;
 
 import java.util.List;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserAdminServiceImpl implements UserAdminService {
@@ -45,8 +46,8 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public List<UserDTO> getUsers(UsersListRequest request) {
-        int pageNumber = (int) Math.floor((double) request.getFrom() / request.getSize());
-        Pageable pageable = PageRequest.of(pageNumber, request.getSize(), Sort.by("id").ascending());
+        Pageable pageable = PageRequest.of(request.getFrom() / request.getSize(), request.getSize(), Sort.by("id").ascending());
+
         Page<User> users = request.getIds() == null
                 ? userRepository.findAll(pageable)
                 : userRepository.findByIdIn(request.getIds(), pageable);
