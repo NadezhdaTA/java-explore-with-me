@@ -18,9 +18,7 @@ import ru.practicum.StatsClient;
 import ru.practicum.ViewStatsDTO;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -86,6 +84,10 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
     }
 
     private Map<Integer, Integer> getEvents(List<Event> events) {
+        if (events == null) {
+            return Collections.emptyMap();
+        }
+
         List<Integer> ids = events.stream()
                 .map(Event::getId)
                 .toList();

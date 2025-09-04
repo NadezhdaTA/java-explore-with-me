@@ -22,10 +22,7 @@ import ru.practicum.StatsClient;
 import ru.practicum.ViewStatsDTO;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -62,46 +59,58 @@ public class EventPublicServiceImpl implements EventPublicService {
                 throw new ValidationException("Range start is after range end");
             }
         }
+
         Specification<Event> spec = eventSpecification(params);
+
         Sort sort = null;
         switch (params.getSort()) {
             case "EVENT_DATE" -> sort = Sort.by(Sort.Direction.DESC, "eventDate");
             case "VIEWS" -> sort = Sort.by(Sort.Direction.ASC, "views");
         }
+
         Pageable pageable = PageRequest.of(params.getFrom(), params.getSize(), sort);
 
-        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
+        List<EventShortDTO> events = eventRepository.findAll(spec, pageable).getContent().stream()
+                .map(eventMapper::toEventShortDTO)
+                .toList();
+
         List<String> uris = events.stream()
                 .map(event -> {
                     return request.getRequestURI() + "/" + event.getId();
                 })
                 .toList();
 
-        Map<Integer, Integer> views = getStats(uris, request);
-        return events.stream()
-                .peek(event -> {
-                    if (views.containsKey(event.getId())) {
-                        event.setViews(views.get(event.getId()));
-                    }
-                })
-                .map(eventMapper::toEventShortDTO)
-                .toList();
+        if (!uris.isEmpty()) {
+            Map<Integer, Integer> views = getStats(uris, request);
+            events.stream()
+                    .peek(event -> {
+                        if (views.containsKey(event.getId())) {
+                            event.setViews(views.get(event.getId()));
+                        }
+                    })
+                    .toList();
+        }
+
+        return events;
     }
 
     private Map<Integer, Integer> getStats(List<String> uris, HttpServletRequest request) {
+        if (uris.isEmpty()) {
+            return Collections.emptyMap();
+        }
 
         LocalDateTime start = LocalDateTime.now().minusMonths(6);
         LocalDateTime end = LocalDateTime.now().plusMinutes(1);
         List<ViewStatsDTO> viewStatsDTOS = statsClient.viewStats(start, end, uris, true);
 
         Map<Integer, Integer> eventViews = new HashMap<>();
-        if (!viewStatsDTOS.isEmpty()) {
-            for (ViewStatsDTO viewStatsDTO : viewStatsDTOS) {
-                int index = viewStatsDTO.getUri().lastIndexOf('/') + 1;
-                int id = parseInt(viewStatsDTO.getUri().substring(index));
-                eventViews.put(id, viewStatsDTO.getHits());
-            }
+
+        for (ViewStatsDTO viewStatsDTO : viewStatsDTOS) {
+            int index = viewStatsDTO.getUri().lastIndexOf('/') + 1;
+            int id = parseInt(viewStatsDTO.getUri().substring(index));
+            eventViews.put(id, viewStatsDTO.getHits());
         }
+
         return eventViews;
     }
 

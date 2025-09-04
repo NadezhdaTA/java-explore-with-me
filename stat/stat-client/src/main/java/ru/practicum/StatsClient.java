@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
@@ -19,14 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class StatsClient extends BaseClient {
-    String serverUrl;
+public class StatsClient {
+    private final String serverUrl;
+    private final RestTemplate restTemplate;
 
     @Autowired
     public StatsClient(@Value("${stat-server.url:http://stat-server:9090}") String serverUrl,
                        RestTemplateBuilder builder) {
-        super(builder.build());
         this.serverUrl = serverUrl;
+        this.restTemplate = builder.build();
     }
 
     public ResponseEntity<Object> createHit(HttpServletRequest request, String appName) {
@@ -37,7 +39,7 @@ public class StatsClient extends BaseClient {
     }
 
     public List<ViewStatsDTO> viewStats(LocalDateTime start, LocalDateTime end,
-                                            List<String> uris, Boolean unique) {
+                                          List<String> uris, Boolean unique) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Map<String, Object> params = new HashMap<>();
         params.put("start", start.format(formatter));
@@ -62,25 +64,17 @@ public class StatsClient extends BaseClient {
         return views;
     }
 
-    private EndpointHitDTO getEndpointHitDTO(HttpServletRequest request, String appName) {
-        String uri = request.getRequestURI();
-        String ip = request.getRemoteAddr();
-        return EndpointHitDTO.builder()
-                .app(appName)
-                .uri(uri)
-                .ip(ip)
-                .timestamp(LocalDateTime.now())
-                .build();
+    private ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
-    protected ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
-        return makeGetRequest(HttpMethod.GET, path, parameters, null);
+    private ResponseEntity<Object> post(String path, Object body) {
+        return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
-    private <T> ResponseEntity<Object> makeGetRequest(HttpMethod method, String path,
-                                                      @Nullable Map<String, Object> parameters,
-                                                      @Nullable T body) {
-
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
+                                                          @Nullable Map<String, Object> parameters,
+                                                          @Nullable T body) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -95,4 +89,14 @@ public class StatsClient extends BaseClient {
         return restTemplate.exchange(builder.build().encode().toUri(),
                 method, entity, Object.class);
     }
+
+    private EndpointHitDTO getEndpointHitDTO(HttpServletRequest request, String appName) {
+        return EndpointHitDTO.builder()
+                .app(appName)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
 }
