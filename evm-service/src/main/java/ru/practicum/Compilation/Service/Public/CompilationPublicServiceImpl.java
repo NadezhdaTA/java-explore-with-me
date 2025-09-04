@@ -49,7 +49,8 @@ public class CompilationPublicServiceImpl implements CompilationPublicService {
 
     @Override
     public List<CompilationDTO> getCompilations(CompilationsListRequestParams params) {
-        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize());
+        int page = (int) Math.floor((double) params.getFrom() / params.getSize());
+        Pageable pageable = PageRequest.of(page, params.getSize());
         Page<Compilation> compilations = params.getPinned() == null
                 ? compilationRepository.findAll(pageable)
                 : compilationRepository.findCompilationByPinned(params.getPinned(), pageable);
