@@ -11,11 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     User save(User newUser);
 
-    void deleteUserById(Integer id);
-
     Optional<User> findUserById(Integer id);
 
-    Page<User> findAll(Pageable pageable);
-
-    Page<User> findAllByIdIn(Collection<Integer> ids, Pageable pageable);
+    Page<User> findByIdIn(Collection<Integer> ids, Pageable pageable);
 }
