@@ -25,7 +25,7 @@ public class StatsClient {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public StatsClient(@Value("${stat-server.url:http://stat-server:9090}") String serverUrl,
+    public StatsClient(@Value(value = "${stat-server.url:http://stat-server:9090}") String serverUrl,
                        RestTemplateBuilder builder) {
         this.serverUrl = serverUrl;
         this.restTemplate = builder.build();
