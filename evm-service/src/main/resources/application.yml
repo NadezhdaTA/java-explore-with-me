@@ -6,7 +6,7 @@ stat-server:
 
 spring:
   jpa:
-    hibernate.ddl-auto: none
+    hibernate.ddl-auto: update
     properties.hibernate.format_sql: true
 
   sql:
