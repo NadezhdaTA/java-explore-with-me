@@ -45,12 +45,12 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public List<UserDTO> getUsers(UsersListRequest request) {
-        int page = request.getFrom() / request.getSize();
-        Pageable pageable = PageRequest.of(page, request.getSize(), Sort.by("id").ascending());
+        int page = request.from() / request.size();
+        Pageable pageable = PageRequest.of(page, request.size(), Sort.by("id").ascending());
 
-        List<User> users = request.getIds() == null || request.getIds().isEmpty()
+        List<User> users = request.ids() == null || request.ids().isEmpty()
                 ? userRepository.findAll(pageable).getContent()
-                : userRepository.findByIdIn(request.getIds(), pageable).getContent();
+                : userRepository.findByIdIn(request.ids(), pageable).getContent();
 
         return users.stream()
                 .map(userMapper::toUserDTO)

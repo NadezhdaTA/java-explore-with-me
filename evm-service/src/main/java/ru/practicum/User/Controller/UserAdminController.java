@@ -1,6 +1,8 @@
 package ru.practicum.User.Controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +33,10 @@ public class UserAdminController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getUsers(@ModelAttribute UsersListRequest request) {
-        return userAdminService.getUsers(request);
+    public List<UserDTO> getUsers(@RequestParam(required = false) List<Integer> ids,
+                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                  @RequestParam(defaultValue = "10") @Positive int size) {
+        return userAdminService.getUsers(new UsersListRequest(ids, from, size));
     }
 
     @DeleteMapping("/{userId}")

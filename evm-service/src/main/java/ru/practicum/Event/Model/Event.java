@@ -21,10 +21,10 @@ public class Event {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "title")
+    @Column(name = "title", length = 200)
     private String title;
 
-    @Column(name = "annotation")
+    @Column(name = "annotation", length = 2000)
     private String annotation;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -36,7 +36,7 @@ public class Event {
     @Column(name = "created_on")
     private LocalDateTime createdOn = LocalDateTime.now();
 
-    @Column(name = "description")
+    @Column(name = "description", length = 7000)
     private String description;
 
     @Column(name = "event_date")

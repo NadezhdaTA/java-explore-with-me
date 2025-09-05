@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.Event.Model.Location;
 
 import java.time.LocalDateTime;
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NewEventDTO {
     @NotBlank
-    @Length(min = 20, max = 2000)
+    @Size(min = 20, max = 2000)
     private String annotation;
 
     @NotNull
@@ -24,7 +23,7 @@ public class NewEventDTO {
     private Integer categoryId;
 
     @NotBlank
-    @Length(min = 20, max = 7000)
+    @Size(min = 20, max = 7000)
     private String description;
 
     @NotNull
@@ -43,6 +42,6 @@ public class NewEventDTO {
     private Boolean requestModeration = true;
 
     @NotBlank
-    @Length(min = 3, max = 120)
+    @Size(min = 3, max = 120)
     private String title;
 }
