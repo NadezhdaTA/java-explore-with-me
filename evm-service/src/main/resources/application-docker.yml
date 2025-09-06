@@ -7,14 +7,7 @@ stat-server:
 spring:
   jpa:
     hibernate.ddl-auto: none
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        jdbc:
-          lob:
-            non_contextual_creation: true
-      show-sql: true
+    properties.hibernate.format_sql: true
 
   sql:
     init:
