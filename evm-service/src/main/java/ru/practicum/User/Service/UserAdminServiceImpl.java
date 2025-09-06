@@ -1,7 +1,6 @@
 package ru.practicum.User.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +14,7 @@ import ru.practicum.User.Model.User;
 import ru.practicum.User.Repository.UserRepository;
 
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -45,13 +45,14 @@ public class UserAdminServiceImpl implements UserAdminService {
 
     @Override
     public List<UserDTO> getUsers(UsersListRequest request) {
-        int pageNumber = (int) Math.floor((double) request.getFrom() / request.getSize());
-        Pageable pageable = PageRequest.of(pageNumber, request.getSize(), Sort.by("id").ascending());
-        Page<User> users = request.getIds() == null
-                ? userRepository.findAll(pageable)
-                : userRepository.findByIdIn(request.getIds(), pageable);
+        int page = request.from() / request.size();
+        Pageable pageable = PageRequest.of(page, request.size(), Sort.by("id").ascending());
 
-        return users.getContent().stream()
+        List<User> users = request.ids() == null || request.ids().isEmpty()
+                ? userRepository.findAll(pageable).getContent()
+                : userRepository.findByIdIn(request.ids(), pageable).getContent();
+
+        return users.stream()
                 .map(userMapper::toUserDTO)
                 .toList();
     }
