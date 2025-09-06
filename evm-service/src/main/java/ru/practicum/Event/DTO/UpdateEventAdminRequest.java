@@ -2,10 +2,10 @@ package ru.practicum.Event.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.Event.Model.Location;
 import ru.practicum.Event.Model.State;
 
@@ -16,12 +16,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UpdateEventAdminRequest {
 
-    @Length(min = 20, max = 2000)
+    @Size(min = 20, max = 2000)
     private String annotation;
 
     private Integer category;
 
-    @Length(min = 20, max = 7000)
+    @Size(min = 20, max = 7000)
     private String description;
 
     @Future
@@ -38,7 +38,7 @@ public class UpdateEventAdminRequest {
 
     private State stateAction;
 
-    @Length(min = 3, max = 120)
+    @Size(min = 3, max = 120)
     private String title;
 
 }
