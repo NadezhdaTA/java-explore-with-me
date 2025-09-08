@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 public class ErrorResponse {
     private HttpStatus status;
     private String message;
-    private String stackTrace;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;

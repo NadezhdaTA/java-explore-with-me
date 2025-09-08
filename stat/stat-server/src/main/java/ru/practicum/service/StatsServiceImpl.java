@@ -25,8 +25,6 @@ public class StatsServiceImpl implements StatsServiceInterface {
     public List<ViewStatsDTO> getStats(StatsRequestDTO statsRequestDTO) {
         if (statsRequestDTO.getStart().isAfter(statsRequestDTO.getEnd())) {
             throw new ValidationException("Start date cannot be after end date");
-        } else if (statsRequestDTO.getStart() == null || statsRequestDTO.getEnd() == null) {
-            throw new ValidationException("Start date cannot be after end date");
         }
 
         List<ViewStatsDTO> stats = new ArrayList<>();
