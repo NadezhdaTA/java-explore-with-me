@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.StatsRequestDTO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,15 +19,15 @@ public class EventPublicParams {
     public ArrayList<Integer> categories;
     private Boolean paid;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime rangeStart;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime rangeEnd;
 
     private Boolean onlyAvailable = false;
 
-    private String sort = "EVENT_DATE";
+    private String sort;
 
     @PositiveOrZero
     private Integer from = 0;

@@ -24,6 +24,6 @@ public class EndpointHitDTO {
     @NotBlank
     private String ip;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime timestamp;
 }

@@ -13,12 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class StatsRequestDTO {
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_FORMAT)
     @NotNull(message = "Start date is required")
     private final LocalDateTime start;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_FORMAT)
     @NotNull(message = "End date is required")
     private final LocalDateTime end;
 

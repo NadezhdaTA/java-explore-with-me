@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.Event.Model.State;
+import ru.practicum.StatsRequestDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +20,10 @@ public class SearchEventsDTO {
     private List<State> states;
     private List<Integer> categories;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime rangeStart = LocalDateTime.now();
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime rangeEnd;
 
     @PositiveOrZero

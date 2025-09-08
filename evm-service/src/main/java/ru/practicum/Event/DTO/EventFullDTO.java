@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.Category.DTO.CategoryDTO;
+import ru.practicum.StatsRequestDTO;
 import ru.practicum.User.DTO.UserShortDTO;
 import ru.practicum.Event.Model.Location;
 import ru.practicum.Event.Model.State;
@@ -23,12 +24,12 @@ public class EventFullDTO {
 
     private Integer confirmedRequests;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime createdOn;
 
     private String description;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime eventDate;
 
     private UserShortDTO initiator;
@@ -39,7 +40,7 @@ public class EventFullDTO {
 
     private Integer participantLimit;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime publishedOn = LocalDateTime.now();
 
     private Boolean requestModeration;

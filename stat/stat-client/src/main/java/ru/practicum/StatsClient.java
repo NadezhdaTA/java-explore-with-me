@@ -40,7 +40,7 @@ public class StatsClient {
 
     public List<ViewStatsDTO> viewStats(LocalDateTime start, LocalDateTime end,
                                           List<String> uris, Boolean unique) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(StatsRequestDTO.DATE_FORMAT);
         Map<String, Object> params = new HashMap<>();
         params.put("start", start.format(formatter));
         params.put("end", end.format(formatter));

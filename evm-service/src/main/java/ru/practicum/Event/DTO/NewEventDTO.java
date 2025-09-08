@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.Event.Model.Location;
+import ru.practicum.StatsRequestDTO;
 
 import java.time.LocalDateTime;
 
@@ -28,7 +29,7 @@ public class NewEventDTO {
 
     @NotNull
     @Future
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = StatsRequestDTO.DATE_FORMAT)
     private LocalDateTime eventDate;
 
     @NotNull
