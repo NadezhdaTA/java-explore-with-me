@@ -63,10 +63,15 @@ public class EventPublicServiceImpl implements EventPublicService {
         Specification<Event> spec = eventSpecification(params);
 
         Sort sort = null;
-        switch (params.getSort()) {
-            case "EVENT_DATE" -> sort = Sort.by(Sort.Direction.DESC, "eventDate");
-            case "VIEWS" -> sort = Sort.by(Sort.Direction.ASC, "views");
+        if (params.getSort() != null) {
+            switch (params.getSort()) {
+                case "EVENT_DATE" -> sort = Sort.by(Sort.Direction.DESC, "eventDate");
+                case "VIEWS" -> sort = Sort.by(Sort.Direction.ASC, "views");
+            }
+        } else {
+            sort = Sort.by(Sort.Direction.DESC, "eventDate");
         }
+
 
         Pageable pageable = PageRequest.of(params.getFrom(), params.getSize(), sort);
 
