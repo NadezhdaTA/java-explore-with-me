@@ -2,26 +2,28 @@ package ru.practicum;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class StatsRequestDTO {
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    @DateTimeFormat(pattern = DATE_FORMAT)
     @NotNull(message = "Start date is required")
-    LocalDateTime start;
+    private final LocalDateTime start;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = DATE_FORMAT)
     @NotNull(message = "End date is required")
-    LocalDateTime end;
+    private final LocalDateTime end;
 
-    List<String> uris;
-    Boolean unique;
+    private List<String> uris;
+    private Boolean unique;
 
 }

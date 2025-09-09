@@ -1,0 +1,20 @@
+package ru.practicum.Compilation.CompilationDTO;
+
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+import java.util.ArrayList;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateCompilationRequest {
+    private ArrayList<Integer> events;
+    private Boolean pinned;
+
+    @Size(min = 1, max = 50)
+    private String title;
+}

@@ -5,12 +5,13 @@ import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDTO;
 import ru.practicum.StatsRequestDTO;
 import ru.practicum.ViewStatsDTO;
+import ru.practicum.exceptions.ValidationException;
 import ru.practicum.mapper.HitsMapper;
 import ru.practicum.mapper.ViewStatsMapper;
 import ru.practicum.model.EndpointHit;
-import ru.practicum.model.ViewStats;
 import ru.practicum.repository.StatsServerRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,21 +23,26 @@ public class StatsServiceImpl implements StatsServiceInterface {
 
     @Override
     public List<ViewStatsDTO> getStats(StatsRequestDTO statsRequestDTO) {
+        if (statsRequestDTO.getStart().isAfter(statsRequestDTO.getEnd())) {
+            throw new ValidationException("Start date cannot be after end date");
+        }
 
-        List<ViewStats> stats;
-        if (statsRequestDTO.getUnique() == null) {
+        List<ViewStatsDTO> stats = new ArrayList<>();
+        if (statsRequestDTO.getUnique() != null && statsRequestDTO.getUnique()) {
+            stats = statsService.getStatsUnique(statsRequestDTO.getStart(), statsRequestDTO.getEnd(),
+                                statsRequestDTO.getUris()).stream()
+                        .map(viewStatsMapper::mapViewStats)
+                        .toList();
+        }
+
+        if (statsRequestDTO.getUnique() == null || statsRequestDTO.getUnique().equals(false)) {
             stats = statsService.getStats(statsRequestDTO.getStart(), statsRequestDTO.getEnd()).stream()
                     .filter(viewStats -> statsRequestDTO.getUris().contains(viewStats.getUri()))
+                    .map(viewStatsMapper::mapViewStats)
                     .toList();
-        } else if (statsRequestDTO.getUnique().equals(true)) {
-                stats = statsService.getStatsUnique(statsRequestDTO.getStart(), statsRequestDTO.getEnd(),
-                        statsRequestDTO.getUris());
-        } else {
-            stats = statsService.getStats(statsRequestDTO.getStart(), statsRequestDTO.getEnd());
+
         }
-        return stats.stream()
-                .map(viewStatsMapper::mapViewStats)
-                .toList();
+        return stats;
     }
 
     @Override
