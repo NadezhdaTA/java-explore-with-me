@@ -67,57 +67,6 @@
 			"response": []
 		},
 		{
-			"name": "Удаление комментария",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "X-User-Id",
-						"value": "15",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:8080/events/comments/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"events",
-						"comments",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Обновление комментария",
 			"event": [
 				{
@@ -284,6 +233,57 @@
 			"key": "baseURL",
 			"value": "",
 			"type": "default"
+		},
+		{
+			"name": "Удаление комментария",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-User-Id",
+						"value": "15",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/events/comments/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"comments",
+						"1"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
