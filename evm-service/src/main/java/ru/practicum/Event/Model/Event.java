@@ -31,7 +31,7 @@ public class Event {
     private Category category;
 
     @Column(name = "confirmed_requests")
-    private Integer confirmedRequests = 0;
+    private Integer confirmedRequests;
 
     @Column(name = "created_on")
     private LocalDateTime createdOn = LocalDateTime.now();
@@ -66,5 +66,5 @@ public class Event {
     private State state;
 
     @Column(name = "views")
-    private Integer views = 0;
+    private Integer views;
 }

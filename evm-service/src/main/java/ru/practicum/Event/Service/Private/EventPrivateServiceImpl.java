@@ -48,6 +48,8 @@ public class EventPrivateServiceImpl implements EventPrivateService {
         newEvent.setInitiator(user);
         newEvent.setCategory(category);
         newEvent.setState(PENDING);
+        newEvent.setConfirmedRequests(0);
+        newEvent.setViews(0);
         return eventMapper.toEventFullDTO(eventRepository.save(newEvent));
     }
 
