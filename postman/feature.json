@@ -37,13 +37,13 @@
 				"header": [
 					{
 						"key": "X-User-Id",
-						"value": "{{userId}}",
+						"value": "15",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"comment\":\"lzkgh oiyu cktyhj xlitu\"\r\n}",
+					"raw": "{\r\n    \"comment\":\"Добавление нового комментария\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -51,20 +51,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/events/comments/:eventId",
+					"raw": "{{baseURL}}/events/comments/6",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"events",
 						"comments",
-						":eventId"
-					],
-					"variable": [
-						{
-							"key": "eventId",
-							"value": "{{uid}}"
-						}
+						"6"
 					]
 				}
 			},
@@ -72,12 +66,26 @@
 		},
 		{
 			"name": "Удаление комментария",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "X-User-Id",
-						"value": "{{userId}}",
+						"value": "15",
 						"type": "text"
 					}
 				],
@@ -94,7 +102,7 @@
 					"variable": [
 						{
 							"key": "commentId",
-							"value": "{{commentId}}"
+							"value": "2"
 						}
 					]
 				}
@@ -103,18 +111,32 @@
 		},
 		{
 			"name": "Обновление комментария",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"method": "PATCH",
 				"header": [
 					{
 						"key": "X-User-Id",
-						"value": "{{userId}}",
+						"value": "15",
 						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"comment\":\"zlsieurzdrof zprouztpiurz;id pdrgjcblkjgjdjf .kujh.\"\r\n}",
+					"raw": "{\r\n    \"comment\":\"Обновление комментария\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -122,20 +144,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/events/comments/:commentId",
+					"raw": "{{baseURL}}/events/comments/1",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"events",
 						"comments",
-						":commentId"
-					],
-					"variable": [
-						{
-							"key": "commentId",
-							"value": "{{commentId}}"
-						}
+						"1"
 					]
 				}
 			},
@@ -192,20 +208,14 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/event/:eventId/comments",
+					"raw": "{{baseURL}}/event/6/comments",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"event",
-						":eventId",
+						"6",
 						"comments"
-					],
-					"variable": [
-						{
-							"key": "eventId",
-							"value": "{{eventId}}"
-						}
 					]
 				}
 			},
@@ -223,6 +233,18 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
@@ -236,20 +258,14 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/events/comments/:commentId",
+					"raw": "{{baseURL}}/events/comments/1",
 					"host": [
 						"{{baseURL}}"
 					],
 					"path": [
 						"events",
 						"comments",
-						":commentId"
-					],
-					"variable": [
-						{
-							"key": "commentId",
-							"value": "{{commentId}}"
-						}
+						"1"
 					]
 				}
 			},
