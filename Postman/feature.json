@@ -192,7 +192,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/event/:eventId/comments?from=0&size=15",
+					"raw": "{{baseURL}}/event/:eventId/comments",
 					"host": [
 						"{{baseURL}}"
 					],
@@ -200,16 +200,6 @@
 						"event",
 						":eventId",
 						"comments"
-					],
-					"query": [
-						{
-							"key": "from",
-							"value": "0"
-						},
-						{
-							"key": "size",
-							"value": "15"
-						}
 					],
 					"variable": [
 						{
