@@ -38,7 +38,7 @@ public class CommentPrivateController {
 
     @DeleteMapping("/{commentId}")
     public void deleteComment(@RequestHeader(USER_ID) Integer userId,
-                              @PathVariable Integer commentId){
+                              @PathVariable Integer commentId) {
         commentService.deleteComment(commentId, userId);
     }
 
