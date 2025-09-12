@@ -51,10 +51,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/events/comments/6",
+					"raw": "http://localhost:8080/events/comments/6",
+					"protocol": "http",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"comments",
@@ -78,6 +80,13 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -90,10 +99,12 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/events/comments/:commentId",
+					"raw": "http://localhost:8080/events/comments/:commentId",
+					"protocol": "http",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"comments",
@@ -123,6 +134,13 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -144,10 +162,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/events/comments/1",
+					"raw": "http://localhost:8080/events/comments/1",
+					"protocol": "http",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"comments",
@@ -194,10 +214,12 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/event/6/comments",
+					"raw": "http://localhost:8080/event/6/comments",
+					"protocol": "http",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"event",
 						"6",
@@ -244,10 +266,12 @@
 					}
 				],
 				"url": {
-					"raw": "{{baseURL}}/events/comments/1",
+					"raw": "http://localhost:8080/events/comments/1",
+					"protocol": "http",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
+					"port": "8080",
 					"path": [
 						"events",
 						"comments",
