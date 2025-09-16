@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.EndpointHitDTO;
 import ru.practicum.StatsRequestDTO;
@@ -16,7 +17,8 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StatsServiceImpl implements StatsServiceInterface {
+@Slf4j
+public class StatsServiceImpl implements StatsService {
     private final StatsServerRepository statsService;
     private final ViewStatsMapper viewStatsMapper;
     private final HitsMapper hitsMapper;
@@ -42,6 +44,7 @@ public class StatsServiceImpl implements StatsServiceInterface {
                     .toList();
 
         }
+        log.info("Found {} stats", stats.size());
         return stats;
     }
 
@@ -49,5 +52,6 @@ public class StatsServiceImpl implements StatsServiceInterface {
     public void createHit(EndpointHitDTO hitDTO) {
         EndpointHit hit = hitsMapper.mapHitDTO(hitDTO);
         statsService.createHit(hit);
+        log.info("Created hit {}", hit);
     }
 }
